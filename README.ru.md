@@ -188,6 +188,25 @@ sudo journalctl -u l4d2 -n 100 --no-pager
 - сервис может уже работать локально, даже если снаружи к нему ещё нельзя подключиться
 - перед проверкой подключения из игры обязательно выполни шаг 8 и убедись, что нужные порты открыты и на самой VPS, и в firewall провайдера
 
+### Чеклист первого запуска
+
+После первого успешного старта выполни такие проверки:
+
+```bash
+sudo systemctl status l4d2 --no-pager
+ss -lntup | grep 27015
+sudo journalctl -u l4d2 -n 50 --no-pager
+sudo -u steam test -f /home/steam/l4d2/left4dead2/addons/metamod.vdf && echo "metamod files present"
+sudo -u steam test -d /home/steam/l4d2/left4dead2/addons/sourcemod && echo "sourcemod files present"
+```
+
+Что ты хочешь увидеть:
+
+- сервис в состоянии `active (running)`
+- порт `27015` слушается
+- в логах нет бесконечного crash loop
+- файлы `Metamod` и `SourceMod` лежат в ожидаемых путях
+
 ### 8. Открыть порты
 
 Минимально:
