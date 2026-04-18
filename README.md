@@ -68,6 +68,7 @@ sudo adduser --disabled-password --gecos "" steam
 sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y \
+  ca-certificates \
   curl \
   git \
   wget \
@@ -168,6 +169,7 @@ sudo install -o root -g root -m 644 /opt/l4d2-linux-server/templates/systemd/l4d
 
 Then edit the placeholders before starting the service:
 
+- set a server name in `hostname` if you do not want to keep the default one
 - set a real `rcon_password` in `/home/steam/l4d2/left4dead2/cfg/server.cfg`
 - add your admin SteamIDs to `/home/steam/l4d2/left4dead2/addons/sourcemod/configs/admins_simple.ini`
 
@@ -187,6 +189,11 @@ If the service does not start:
 ```bash
 sudo journalctl -u l4d2 -n 100 --no-pager
 ```
+
+Important:
+
+- the service can be running locally even before external access works
+- before testing from the game client, complete Step 8 and make sure the required ports are open both on the VPS and in the provider firewall
 
 ### 8. Open ports
 
