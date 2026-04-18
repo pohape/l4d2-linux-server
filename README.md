@@ -2,16 +2,20 @@
 
 # l4d2-linux-server
 
-Practical templates and setup notes for running a public `Left 4 Dead 2` dedicated server on `Ubuntu 22.04` with:
+Scripts and templates to set up a public `Left 4 Dead 2` dedicated server
+on an Ubuntu VPS quickly, and to install Steam Workshop maps without the
+usual forum-guide hassle.
 
-- native Linux server binaries
-- `systemd` service management
-- `Metamod:Source`
-- `SourceMod` admin access
-- custom maps
-- `Tank Challenge v1.5` as a verified example
+What you get:
 
-This repository is based on a real deployment on a public VPS, not only on old forum guides.
+- native Linux binaries (`srcds_linux`) under `systemd`
+- `Metamod:Source` + `SourceMod` admin access
+- idempotent install scripts for every step (packages → SteamCMD →
+  Metamod + SourceMod → templates → service enable → verify)
+- a single-command Steam Workshop map installer
+- Tank Challenge and Tropical Holdout as verified map examples
+
+Based on a real deployment on a public VPS, not on old forum guides.
 
 ## Verified setup
 
