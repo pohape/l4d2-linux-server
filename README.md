@@ -195,6 +195,25 @@ Important:
 - the service can be running locally even before external access works
 - before testing from the game client, complete Step 8 and make sure the required ports are open both on the VPS and in the provider firewall
 
+### First boot checklist
+
+Run these checks after the first successful start:
+
+```bash
+sudo systemctl status l4d2 --no-pager
+ss -lntup | grep 27015
+sudo journalctl -u l4d2 -n 50 --no-pager
+sudo -u steam test -f /home/steam/l4d2/left4dead2/addons/metamod.vdf && echo "metamod files present"
+sudo -u steam test -d /home/steam/l4d2/left4dead2/addons/sourcemod && echo "sourcemod files present"
+```
+
+What you want to see:
+
+- the service is `active (running)`
+- port `27015` is listening
+- the logs do not show a crash loop
+- Metamod and SourceMod files exist in the expected paths
+
 ### 8. Open ports
 
 At minimum:
