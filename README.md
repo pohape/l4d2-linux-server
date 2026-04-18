@@ -168,6 +168,13 @@ Then edit the placeholders before starting the service:
 - set a real `rcon_password` in `/home/steam/l4d2/left4dead2/cfg/server.cfg`
 - add your admin SteamIDs to `/home/steam/l4d2/left4dead2/addons/sourcemod/configs/admins_simple.ini`
 
+To find your SteamID:
+
+1. open your Steam profile in a browser and copy its URL
+2. paste the URL into [steamid.io](https://steamid.io)
+3. copy the value shown as **steamID** (looks like `STEAM_0:1:12345678`)
+4. paste that line into `admins_simple.ini`
+
 The `systemd` template is already set up to listen on all interfaces, which is usually the safest option for the first start. If you later want to bind the server to one specific address, you can manually add `-ip <PUBLIC_IPV4>` to `ExecStart`.
 
 If you change these files later after the service is already running, restart it:
@@ -335,6 +342,12 @@ Example:
 ```
 
 Each admin gets a separate line. Multiple admins are fully supported.
+
+To add a new admin to a running server, find their SteamID the same way as in step 6, paste the line into `admins_simple.ini`, and apply the change:
+
+```bash
+sudo systemctl restart l4d2
+```
 
 ## Caveats
 
