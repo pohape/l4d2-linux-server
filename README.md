@@ -220,6 +220,16 @@ Important:
 - open these ports in the VPS operating system firewall if one is enabled
 - also open them in the cloud provider firewall or security group if your provider uses one
 
+If the VPS uses `ufw`:
+
+```bash
+sudo ufw allow 27015/udp
+sudo ufw allow 27015/tcp
+sudo ufw allow 27000:27030/udp
+sudo ufw allow 4380/udp
+sudo ufw status
+```
+
 ## Connect to the server
 
 First, enable the developer console in the game settings if it is not enabled yet.
@@ -312,7 +322,7 @@ sudo journalctl -u l4d2 -f
 
 SourceMod admins are defined in:
 
-- `addons/sourcemod/configs/admins_simple.ini`
+- `/home/steam/l4d2/left4dead2/addons/sourcemod/configs/admins_simple.ini`
 
 Example:
 
