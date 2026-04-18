@@ -190,6 +190,13 @@ systemd-юнит `l4d2.service`. По умолчанию уже существу
 - задать реальный `rcon_password` в `/home/steam/l4d2/left4dead2/cfg/server.cfg`
 - добавить свои SteamID админов в `/home/steam/l4d2/left4dead2/addons/sourcemod/configs/admins_simple.ini`
 
+Как найти свой SteamID:
+
+1. открой свой профиль Steam в браузере и скопируй его ссылку
+2. вставь ссылку на [steamid.io](https://steamid.io)
+3. скопируй значение, указанное как **steamID** (вида `STEAM_0:1:12345678`)
+4. вставь эту строку в `admins_simple.ini`
+
 Шаблон `systemd` уже настроен так, чтобы сервер слушал на всех интерфейсах. Это обычно удобнее и безопаснее для первого запуска. Если позже захочешь жёстко привязать сервер к конкретному адресу, можешь вручную добавить `-ip <PUBLIC_IPV4>` в `ExecStart`.
 
 Если ты меняешь эти файлы уже после запуска сервиса, сделай:
@@ -240,6 +247,16 @@ sudo bash /opt/l4d2-linux-server/scripts/verify-install.sh
 
 - открой эти порты в локальном firewall самой VPS, если он включён
 - также открой эти порты в firewall/security group у облачного провайдера, если он используется
+
+Если на VPS используется `ufw`:
+
+```bash
+sudo ufw allow 27015/udp
+sudo ufw allow 27015/tcp
+sudo ufw allow 27000:27030/udp
+sudo ufw allow 4380/udp
+sudo ufw status
+```
 
 ## Как подключаться
 
@@ -336,7 +353,7 @@ sudo journalctl -u l4d2 -f
 
 Админы задаются в:
 
-- `addons/sourcemod/configs/admins_simple.ini`
+- `/home/steam/l4d2/left4dead2/addons/sourcemod/configs/admins_simple.ini`
 
 Пример:
 
@@ -349,6 +366,12 @@ sudo journalctl -u l4d2 -f
 ```
 
 Каждый админ добавляется отдельной строкой.
+
+Чтобы добавить нового админа на уже работающий сервер — найди его SteamID тем же способом, что и в шаге 6, вставь строку в `admins_simple.ini` и применяй:
+
+```bash
+sudo systemctl restart l4d2
+```
 
 ## Ограничения
 
