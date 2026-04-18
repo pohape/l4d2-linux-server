@@ -1,0 +1,19 @@
+[Unit]
+Description=Left 4 Dead 2 Dedicated Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=steam
+Group=steam
+WorkingDirectory=/home/steam/l4d2
+LimitNOFILE=65535
+Restart=always
+RestartSec=5
+ExecStart=/home/steam/l4d2/srcds_run -game left4dead2 -console -usercon -strictportbind -norestart -port 27015 +map c2m1_highway +maxplayers 4 +exec server.cfg
+ExecStop=/bin/kill -s TERM $MAINPID
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
