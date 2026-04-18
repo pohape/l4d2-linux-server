@@ -50,6 +50,15 @@ On `Ubuntu 22.04`, install the `i386` runtime packages before downloading the ga
 ├── README.ru.md
 ├── docs/
 │   └── tank-challenge.md
+├── scripts/
+│   ├── _common.sh
+│   ├── enable-service.sh
+│   ├── install-mms-sm.sh
+│   ├── install-packages.sh
+│   ├── install-steamcmd.sh
+│   ├── install-tank-challenge.sh
+│   ├── install-templates.sh
+│   └── verify-install.sh
 └── templates/
     ├── server.cfg
     ├── sourcemod/
@@ -59,30 +68,13 @@ On `Ubuntu 22.04`, install the `i386` runtime packages before downloading the ga
         └── l4d2.service
 ```
 
+All the `install-*.sh` scripts are idempotent: it's safe to re-run them on
+an already configured host. The `install-templates.sh` script will not
+overwrite existing config files unless you pass `FORCE=1`.
+
 ## Quick start
 
-### 1. Install system packages
-
-```bash
-sudo adduser --disabled-password --gecos "" steam
-sudo dpkg --add-architecture i386
-sudo apt update
-sudo apt install -y \
-  ca-certificates \
-  curl \
-  git \
-  wget \
-  tar \
-  tmux \
-  screen \
-  unzip \
-  jq \
-  lib32gcc-s1 \
-  lib32stdc++6 \
-  libc6-i386
-```
-
-### 2. Clone this repository
+### 1. Clone this repository
 
 ```bash
 sudo mkdir -p /opt
@@ -92,18 +84,23 @@ sudo chown -R "$USER":"$USER" /opt/l4d2-linux-server
 
 If you cloned the repo somewhere else, adjust the paths in the next steps.
 
-### 3. Install SteamCMD manually
+### 2. Install system packages
 
 ```bash
-sudo -u steam -H bash -lc '
-mkdir -p /home/steam/steamcmd
-cd /home/steam/steamcmd
-wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
-tar -xzf steamcmd_linux.tar.gz
-mkdir -p /home/steam/.steam/sdk32
-ln -sf /home/steam/steamcmd/linux32/steamclient.so /home/steam/.steam/sdk32/steamclient.so
-'
+sudo bash /opt/l4d2-linux-server/scripts/install-packages.sh
 ```
+
+Creates the `steam` user, enables the `i386` architecture, and installs the
+runtime packages required by `srcds_linux`.
+
+### 3. Install SteamCMD
+
+```bash
+sudo bash /opt/l4d2-linux-server/scripts/install-steamcmd.sh
+```
+
+Downloads SteamCMD into `/home/steam/steamcmd` and creates the
+`~/.steam/sdk32/steamclient.so` symlink.
 
 ### 4. Install the L4D2 dedicated server
 
@@ -136,36 +133,29 @@ Expected files after install:
 ### 5. Install Metamod and SourceMod
 
 ```bash
-sudo -u steam -H bash -lc '
-cd /home/steam/l4d2
-curl -fsSL https://mms.alliedmods.net/mmsdrop/1.12/mmsource-1.12.0-git1219-linux.tar.gz -o /tmp/mmsource.tar.gz
-tar -xzf /tmp/mmsource.tar.gz -C /home/steam/l4d2/left4dead2
-curl -fsSL https://sm.alliedmods.net/smdrop/1.12/sourcemod-1.12.0-git7223-linux.tar.gz -o /tmp/sourcemod.tar.gz
-tar -xzf /tmp/sourcemod.tar.gz -C /home/steam/l4d2/left4dead2
-mkdir -p /home/steam/l4d2/left4dead2/addons/sourcemod/plugins/disabled
-if [ -f /home/steam/l4d2/left4dead2/addons/sourcemod/plugins/nextmap.smx ]; then
-  mv /home/steam/l4d2/left4dead2/addons/sourcemod/plugins/nextmap.smx \
-    /home/steam/l4d2/left4dead2/addons/sourcemod/plugins/disabled/
-fi
-'
+sudo bash /opt/l4d2-linux-server/scripts/install-mms-sm.sh
 ```
 
-If these exact URLs ever stop working, use the latest Linux `1.12` builds from AlliedModders and keep the same extraction paths.
+Downloads and extracts the pinned Linux `1.12` builds of Metamod:Source and
+SourceMod, and moves `nextmap.smx` into `plugins/disabled/` so the plugin
+does not force map rotation.
+
+If AlliedModders ever retires those exact builds, override the URLs:
+
+```bash
+sudo MMS_URL=... SM_URL=... -E bash /opt/l4d2-linux-server/scripts/install-mms-sm.sh
+```
 
 ### 6. Copy the template files
 
-Copy the templates:
-
 ```bash
-sudo install -o steam -g steam -m 644 /opt/l4d2-linux-server/templates/server.cfg \
-  /home/steam/l4d2/left4dead2/cfg/server.cfg
-sudo install -o steam -g steam -m 644 /opt/l4d2-linux-server/templates/sourcemod/admins_simple.ini \
-  /home/steam/l4d2/left4dead2/addons/sourcemod/configs/admins_simple.ini
-sudo install -o steam -g steam -m 644 /opt/l4d2-linux-server/templates/sourcemod/adminmenu_maplist.ini \
-  /home/steam/l4d2/left4dead2/addons/sourcemod/configs/adminmenu_maplist.ini
-sudo install -o root -g root -m 644 /opt/l4d2-linux-server/templates/systemd/l4d2.service \
-  /etc/systemd/system/l4d2.service
+sudo bash /opt/l4d2-linux-server/scripts/install-templates.sh
 ```
+
+Installs `server.cfg`, `admins_simple.ini`, `adminmenu_maplist.ini`, and the
+`l4d2.service` unit. By default, existing files are NOT overwritten, so
+re-runs will not clobber your `rcon_password` or `hostname`. Pass `FORCE=1`
+to back up the existing file (to `<dst>.bak.<timestamp>`) and replace it.
 
 Then edit the placeholders before starting the service:
 
@@ -175,44 +165,41 @@ Then edit the placeholders before starting the service:
 
 The `systemd` template is already set up to listen on all interfaces, which is usually the safest option for the first start. If you later want to bind the server to one specific address, you can manually add `-ip <PUBLIC_IPV4>` to `ExecStart`.
 
-### 7. Enable the service
+If you change these files later after the service is already running, restart it:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now l4d2.service
-sudo systemctl status l4d2.service
-ss -lntup | grep 27015
+sudo systemctl restart l4d2
 ```
 
-If the service does not start:
+### 7. Enable the service and verify the install
 
 ```bash
-sudo journalctl -u l4d2 -n 100 --no-pager
+sudo bash /opt/l4d2-linux-server/scripts/enable-service.sh
 ```
+
+This reloads systemd, enables and starts `l4d2.service`, and then runs
+`verify-install.sh`. The verification checks the `steam` user, the `i386`
+runtime packages, the server binaries, Metamod and SourceMod files,
+`rcon_password`, admins, the `systemd` unit, port `27015`, and the last 200
+log lines. Exit code is `0` when everything required passes, non-zero
+otherwise.
 
 Important:
 
 - the service can be running locally even before external access works
 - before testing from the game client, complete Step 8 and make sure the required ports are open both on the VPS and in the provider firewall
 
-### First boot checklist
-
-Run these checks after the first successful start:
+If something fails, inspect the service logs:
 
 ```bash
-sudo systemctl status l4d2 --no-pager
-ss -lntup | grep 27015
-sudo journalctl -u l4d2 -n 50 --no-pager
-sudo -u steam test -f /home/steam/l4d2/left4dead2/addons/metamod.vdf && echo "metamod files present"
-sudo -u steam test -d /home/steam/l4d2/left4dead2/addons/sourcemod && echo "sourcemod files present"
+sudo journalctl -u l4d2 -n 100 --no-pager
 ```
 
-What you want to see:
+You can re-run `verify-install.sh` any time:
 
-- the service is `active (running)`
-- port `27015` is listening
-- the logs do not show a crash loop
-- Metamod and SourceMod files exist in the expected paths
+```bash
+sudo bash /opt/l4d2-linux-server/scripts/verify-install.sh
+```
 
 ### 8. Open ports
 
@@ -229,6 +216,8 @@ Important:
 - also open them in the cloud provider firewall or security group if your provider uses one
 
 ## Connect to the server
+
+First, enable the developer console in the game settings if it is not enabled yet.
 
 In the in-game console:
 
@@ -251,6 +240,8 @@ Important:
 
 ## Open the SourceMod admin menu
 
+The developer console in the game must be enabled as well.
+
 In the in-game console:
 
 ```txt
@@ -259,9 +250,17 @@ sm_admin
 
 ## Start Tank Challenge
 
-First, make sure the map is installed on the server by following [docs/tank-challenge.md](docs/tank-challenge.md).
+Install the custom map:
 
-If you are already an admin on the server:
+```bash
+sudo bash /opt/l4d2-linux-server/scripts/install-tank-challenge.sh
+```
+
+The script downloads the workshop item via anonymous SteamCMD and places the
+`.vpk` into `addons/`. It is idempotent — skips the download if the VPK
+already exists (pass `FORCE=1` to re-download).
+
+Then, as an admin, switch to the map in-game:
 
 ```txt
 sm_map l4d2_tank_challenge_15_rounds
@@ -269,7 +268,8 @@ sm_map l4d2_tank_challenge_20_rounds
 sm_map l4d2_tank_challenge_30_rounds
 ```
 
-See [docs/tank-challenge.md](docs/tank-challenge.md) for the download and placement workflow.
+See [docs/tank-challenge.md](docs/tank-challenge.md) for background on the
+workshop download + filename mapping.
 
 ## Daily operations
 
