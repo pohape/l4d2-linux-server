@@ -76,7 +76,12 @@ overwrite existing config files unless you pass `FORCE=1`.
 
 ### 1. Clone this repository
 
+Some minimal Ubuntu cloud images do not ship with `git` preinstalled, so the
+first two lines guarantee it is available:
+
 ```bash
+sudo apt update
+sudo apt install -y git
 sudo mkdir -p /opt
 sudo git clone https://github.com/pohape/l4d2-linux-server /opt/l4d2-linux-server
 sudo chown -R "$USER":"$USER" /opt/l4d2-linux-server
@@ -143,7 +148,7 @@ does not force map rotation.
 If AlliedModders ever retires those exact builds, override the URLs:
 
 ```bash
-sudo MMS_URL=... SM_URL=... -E bash /opt/l4d2-linux-server/scripts/install-mms-sm.sh
+sudo MMS_URL=... SM_URL=... bash /opt/l4d2-linux-server/scripts/install-mms-sm.sh
 ```
 
 ### 6. Copy the template files
@@ -326,6 +331,14 @@ Each admin gets a separate line. Multiple admins are fully supported.
 ### Players still need the custom map
 
 This repository does not configure `FastDL`. If you switch the server to `Tank Challenge`, players should already have that map installed locally, or you should add a proper download delivery setup separately.
+
+### Common failure modes on a clean VPS
+
+- forgot to open the required ports in the cloud provider's web UI
+- forgot to open the required ports in the VPS's own firewall
+- tried to install the server with `anonymous` instead of a Steam account that owns L4D2
+- did not add their SteamID to `admins_simple.ini`, then tried to open `sm_admin`
+- tried to switch the server to `Tank Challenge` without installing the map first
 
 ### Start on a stock map, switch to custom maps manually
 
