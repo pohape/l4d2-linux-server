@@ -1,20 +1,37 @@
 #!/usr/bin/env bash
 #
-# Install the Tank Challenge custom map.
+# Install an L4D2 Steam Workshop map into the dedicated server.
 #
-# Downloads workshop item 151833267 (L4D2 Tank Challenge v1.5) via anonymous
-# SteamCMD, and copies the resulting file into addons/ as a .vpk.
+# Downloads a workshop item via anonymous SteamCMD and copies the resulting
+# file into addons/ as a .vpk. Idempotent: skips the download if the target
+# VPK already exists (set FORCE=1 to re-download).
 #
-# Idempotent: if the target VPK already exists, the script exits without
-# re-downloading. Set FORCE=1 to re-download.
+# Required env var:
+#   WORKSHOP_ITEM  workshop file id (digits), e.g. 1432537029
+#
+# Optional:
+#   VPK_NAME        destination filename in addons/
+#                   (default: workshop_<WORKSHOP_ITEM>.vpk)
+#   WORKSHOP_APPID  default 550 (Left 4 Dead 2)
+#   FORCE           set 1 to re-download even if the VPK already exists
 
 set -euo pipefail
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
 WORKSHOP_APPID="${WORKSHOP_APPID:-550}"
-WORKSHOP_ITEM="${WORKSHOP_ITEM:-151833267}"
-VPK_NAME="${VPK_NAME:-l4d2_tank_challenge.vpk}"
+WORKSHOP_ITEM="${WORKSHOP_ITEM:-}"
+VPK_NAME="${VPK_NAME:-}"
 FORCE="${FORCE:-0}"
+
+if [ -z "$WORKSHOP_ITEM" ]; then
+  err "WORKSHOP_ITEM is required."
+  err "Example: sudo WORKSHOP_ITEM=1432537029 bash $0"
+  exit 2
+fi
+
+if [ -z "$VPK_NAME" ]; then
+  VPK_NAME="workshop_${WORKSHOP_ITEM}.vpk"
+fi
 
 require_root "$@"
 require_user "$STEAM_USER"
@@ -54,7 +71,7 @@ if ! sudo -u "$STEAM_USER" test -d "$CONTENT_DIR"; then
 fi
 
 info "Locating downloaded map file in $CONTENT_DIR"
-SRC="$(sudo -u "$STEAM_USER" find "$CONTENT_DIR" -maxdepth 1 -type f \
+SRC="$(find "$CONTENT_DIR" -maxdepth 1 -type f \
          \( -name '*_legacy.bin' -o -name '*.vpk' -o -name '*.bin' \) \
          -print -quit)"
 
@@ -65,12 +82,4 @@ fi
 
 info "Copying $SRC -> $TARGET"
 sudo -u "$STEAM_USER" cp "$SRC" "$TARGET"
-ok "Tank Challenge installed at $TARGET"
-
-cat <<EOF
-
-Switch to the map in-game (as an admin) with:
-  sm_map l4d2_tank_challenge_15_rounds
-  sm_map l4d2_tank_challenge_20_rounds
-  sm_map l4d2_tank_challenge_30_rounds
-EOF
+ok "Installed at $TARGET"

@@ -48,16 +48,14 @@ On `Ubuntu 22.04`, install the `i386` runtime packages before downloading the ga
 .
 ├── README.md
 ├── README.ru.md
-├── docs/
-│   └── tank-challenge.md
 ├── scripts/
 │   ├── _common.sh
 │   ├── enable-service.sh
 │   ├── install-mms-sm.sh
 │   ├── install-packages.sh
 │   ├── install-steamcmd.sh
-│   ├── install-tank-challenge.sh
 │   ├── install-templates.sh
+│   ├── install-workshop-map.sh
 │   └── verify-install.sh
 └── templates/
     ├── server.cfg
@@ -270,19 +268,41 @@ In the in-game console:
 sm_admin
 ```
 
-## Start Tank Challenge
+## Install a custom map from the Steam Workshop
 
-Install the custom map:
+`install-workshop-map.sh` downloads any L4D2 Workshop map via anonymous
+SteamCMD and copies the `.vpk` into `addons/workshop_<id>.vpk`. Idempotent —
+skips the download if the target VPK already exists (pass `FORCE=1` to
+re-download).
+
+Pick the item id from its Workshop URL
+(`steamcommunity.com/sharedfiles/filedetails/?id=<WORKSHOP_ITEM>`) and run:
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/install-tank-challenge.sh
+sudo WORKSHOP_ITEM=<id> bash /opt/l4d2-linux-server/scripts/install-workshop-map.sh
 ```
 
-The script downloads the workshop item via anonymous SteamCMD and places the
-`.vpk` into `addons/`. It is idempotent — skips the download if the VPK
-already exists (pass `FORCE=1` to re-download).
+The installed filename (`workshop_<id>.vpk`) can be overridden with
+`VPK_NAME=…` if you prefer a friendlier name.
 
-Then, as an admin, switch to the map in-game:
+To list the `sm_map` / `changelevel` names inside an installed VPK:
+
+```bash
+sudo strings /home/steam/l4d2/left4dead2/addons/workshop_<id>.vpk \
+  | grep -oE '^maps/[a-z0-9_]+\.bsp$' | sort -u
+```
+
+### Verified examples
+
+#### Tank Challenge
+
+Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=151833267
+
+```bash
+sudo WORKSHOP_ITEM=151833267 bash /opt/l4d2-linux-server/scripts/install-workshop-map.sh
+```
+
+Switch to it in-game (as a SourceMod admin):
 
 ```txt
 sm_map l4d2_tank_challenge_15_rounds
@@ -290,8 +310,20 @@ sm_map l4d2_tank_challenge_20_rounds
 sm_map l4d2_tank_challenge_30_rounds
 ```
 
-See [docs/tank-challenge.md](docs/tank-challenge.md) for background on the
-workshop download + filename mapping.
+#### Tropical Holdout
+
+Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=1432537029
+
+```bash
+sudo WORKSHOP_ITEM=1432537029 bash /opt/l4d2-linux-server/scripts/install-workshop-map.sh
+```
+
+Switch to it in-game (as a SourceMod admin):
+
+```txt
+sm_map pujo         # day variant
+sm_map pujonight    # night variant
+```
 
 ## Daily operations
 
