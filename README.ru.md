@@ -1,6 +1,6 @@
 [🇬🇧 English guide](README.md)
 
-# Свой собственный сервер Left4Dead 2 на Ubuntu VPS за 20 минут
+# Собственный сервер Left 4 Dead 2 на Ubuntu VPS за 20 минут
 
 Скрипты и шаблоны, чтобы быстро развернуть публичный dedicated-сервер
 `Left 4 Dead 2` на Ubuntu VPS и ставить карты из Steam Workshop без
