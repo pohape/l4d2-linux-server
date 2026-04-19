@@ -285,6 +285,88 @@ Developer console в игре тоже должна быть включена.
 sm_admin
 ```
 
+## Полезные админ-команды
+
+Все вводятся в игровой консоли (по умолчанию `~`). Чтобы работали, ты
+должен быть в `admins_simple.ini`.
+
+- **`sm_admin`** — открывает интерактивное админ-меню (список игроков,
+  серверные команды, голосования, …).
+  ```txt
+  sm_admin
+  ```
+
+- **`sm_map <имя>`** — сменить текущую карту (карта должна быть в
+  `adminmenu_maplist.ini`; `install-workshop-map.sh` регистрирует
+  Workshop-карты автоматически).
+  ```txt
+  sm_map c2m1_highway
+  sm_map l4d2_ravenholmwar_1
+  ```
+
+- **`sm_cvar <cvar> <value>`** — поменять любой серверный cvar на лету.
+  ```txt
+  sm_cvar z_difficulty Impossible
+  sm_cvar mp_gamemode versus
+  ```
+
+- **`sm_kick <имя> [причина]`** — отключить игрока от сервера.
+  ```txt
+  sm_kick PlayerName afk
+  ```
+
+- **`sm_ban <имя> <минут> [причина]`** — забанить игрока (`0` минут =
+  навсегда).
+  ```txt
+  sm_ban BadPlayer 60 griefing
+  sm_ban BadPlayer 0 cheats
+  ```
+
+- **`sm_slay <имя>`** — мгновенно убить игрока. `@me` убивает тебя —
+  удобно чтобы протестировать takeover-меню ABM.
+  ```txt
+  sm_slay @me
+  sm_slay PlayerName
+  ```
+
+- **`sm_slap <имя> [damage]`** — нанести урон без убийства.
+  ```txt
+  sm_slap PlayerName 10
+  ```
+
+- **`sm_who`** — список подключённых игроков и их админ-флагов.
+  ```txt
+  sm_who
+  ```
+
+- **`sm_say <сообщение>`** / **`sm_psay <имя> <сообщение>`** —
+  broadcast-сообщение всем / приватное сообщение одному игроку.
+  ```txt
+  sm_say Смена карты через 30 секунд
+  sm_psay PlayerName перестань стрелять по своим
+  ```
+
+- **`sm_reloadadmins`** — перечитать `admins_simple.ini` после
+  добавления новых админов (без рестарта сервиса).
+  ```txt
+  sm_reloadadmins
+  ```
+
+- **`sm plugins refresh`** — перечитать конфиги плагинов, включая
+  `adminmenu_maplist.ini` (подхватит новые карты без рестарта сервиса).
+  ```txt
+  sm plugins refresh
+  ```
+
+### L4D2 cvars, которые чаще всего крутят через `sm_cvar`
+
+- `z_difficulty` — `Easy` / `Normal` / `Hard` (Advanced) / `Impossible` (Expert)
+- `mp_gamemode` — `coop` / `versus` / `scavenge` / `realism` / `survival`
+- `sv_gametypes` — какой тип сервер показывает в браузере (`"coop"`, `"versus"`, …)
+- `survivor_limit` — максимум survivor-слотов (дефолт 4)
+- `director_no_specials` / `director_no_mobs` — отключить special infected / horde-спавны
+- `mp_teams_unbalance_limit` — выставить `0` чтобы разрешить неравные команды в versus
+
 ## Установка кастомной карты из Steam Workshop
 
 `install-workshop-map.sh` скачивает любую L4D2-карту из Workshop через
