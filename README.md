@@ -71,9 +71,9 @@ On `Ubuntu 22.04`, install the `i386` runtime packages before downloading the ga
         └── l4d2.service
 ```
 
-All the `install-*.sh` scripts are idempotent: it's safe to re-run them on
-an already configured host. The `install-templates.sh` script will not
-overwrite existing config files unless you pass `FORCE=1`.
+All the `install-*.sh` scripts are idempotent — safe to re-run on an
+already configured host. If you want to force a step to re-do itself,
+delete the target file(s) it produced, then re-run.
 
 ## Quick start
 
@@ -95,7 +95,7 @@ If you cloned the repo somewhere else, adjust the paths in the next steps.
 ### 2. Install system packages
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/install-packages.sh
+sudo /opt/l4d2-linux-server/scripts/install-packages.sh
 ```
 
 Creates the `steam` user, enables the `i386` architecture, and installs the
@@ -104,7 +104,7 @@ runtime packages required by `srcds_linux`.
 ### 3. Install SteamCMD
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/install-steamcmd.sh
+sudo /opt/l4d2-linux-server/scripts/install-steamcmd.sh
 ```
 
 Downloads SteamCMD into `/home/steam/steamcmd` and creates the
@@ -141,29 +141,26 @@ Expected files after install:
 ### 5. Install Metamod and SourceMod
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/install-mms-sm.sh
+sudo /opt/l4d2-linux-server/scripts/install-mms-sm.sh
 ```
 
 Downloads and extracts the pinned Linux `1.12` builds of Metamod:Source and
 SourceMod, and moves `nextmap.smx` into `plugins/disabled/` so the plugin
 does not force map rotation.
 
-If AlliedModders ever retires those exact builds, override the URLs:
-
-```bash
-sudo MMS_URL=... SM_URL=... bash /opt/l4d2-linux-server/scripts/install-mms-sm.sh
-```
+If AlliedModders ever retires those exact builds, edit `MMS_URL` /
+`SM_URL` at the top of `scripts/install-mms-sm.sh` before running it.
 
 ### 6. Copy the template files
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/install-templates.sh
+sudo /opt/l4d2-linux-server/scripts/install-templates.sh
 ```
 
 Installs `server.cfg`, `admins_simple.ini`, `adminmenu_maplist.ini`, and the
-`l4d2.service` unit. By default, existing files are NOT overwritten, so
-re-runs will not clobber your `rcon_password` or `hostname`. Pass `FORCE=1`
-to back up the existing file (to `<dst>.bak.<timestamp>`) and replace it.
+`l4d2.service` unit. Existing files are NOT overwritten, so re-runs will
+not clobber your `rcon_password` or `hostname`. To reinstall a template
+from scratch, delete the target file first then re-run.
 
 Then edit the placeholders before starting the service:
 
@@ -189,7 +186,7 @@ sudo systemctl restart l4d2
 ### 7. Enable the service and verify the install
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/enable-service.sh
+sudo /opt/l4d2-linux-server/scripts/enable-service.sh
 ```
 
 This reloads systemd, enables and starts `l4d2.service`, and then runs
@@ -213,7 +210,7 @@ sudo journalctl -u l4d2 -n 100 --no-pager
 You can re-run `verify-install.sh` any time:
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/verify-install.sh
+sudo /opt/l4d2-linux-server/scripts/verify-install.sh
 ```
 
 ### 8. Open ports
@@ -276,19 +273,23 @@ sm_admin
 ## Install a custom map from the Steam Workshop
 
 `install-workshop-map.sh` downloads any L4D2 Workshop map via anonymous
-SteamCMD and copies the `.vpk` into `addons/workshop_<id>.vpk`. Idempotent —
-skips the download if the target VPK already exists (pass `FORCE=1` to
-re-download).
+SteamCMD and copies the `.vpk` into `addons/workshop_<id>.vpk`.
+Idempotent — skips the download if the target VPK already exists; to
+re-download, delete the VPK first.
 
 Pick the item id from its Workshop URL
-(`steamcommunity.com/sharedfiles/filedetails/?id=<WORKSHOP_ITEM>`) and run:
+(`steamcommunity.com/sharedfiles/filedetails/?id=<id>`) and run:
 
 ```bash
-sudo WORKSHOP_ITEM=<id> bash /opt/l4d2-linux-server/scripts/install-workshop-map.sh
+sudo /opt/l4d2-linux-server/scripts/install-workshop-map.sh <id>
 ```
 
-The installed filename (`workshop_<id>.vpk`) can be overridden with
-`VPK_NAME=…` if you prefer a friendlier name.
+The installed filename (`workshop_<id>.vpk`) can be overridden with a
+second positional argument if you prefer a friendlier name:
+
+```bash
+sudo /opt/l4d2-linux-server/scripts/install-workshop-map.sh <id> <filename>.vpk
+```
 
 To list the `sm_map` / `changelevel` names inside an installed VPK:
 
@@ -304,7 +305,7 @@ sudo strings /home/steam/l4d2/left4dead2/addons/workshop_<id>.vpk \
 Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=151833267
 
 ```bash
-sudo WORKSHOP_ITEM=151833267 bash /opt/l4d2-linux-server/scripts/install-workshop-map.sh
+sudo /opt/l4d2-linux-server/scripts/install-workshop-map.sh 151833267
 ```
 
 Switch to it in-game (as a SourceMod admin):
@@ -320,7 +321,7 @@ sm_map l4d2_tank_challenge_30_rounds
 Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=1432537029
 
 ```bash
-sudo WORKSHOP_ITEM=1432537029 bash /opt/l4d2-linux-server/scripts/install-workshop-map.sh
+sudo /opt/l4d2-linux-server/scripts/install-workshop-map.sh 1432537029
 ```
 
 Switch to it in-game (as a SourceMod admin):
@@ -363,13 +364,14 @@ Steam Workshop VScript addons (fetched into `addons/` as VPKs):
 Install the whole stack in one shot:
 
 ```bash
-sudo bash /opt/l4d2-linux-server/scripts/install-mods.sh
+sudo /opt/l4d2-linux-server/scripts/install-mods.sh
 sudo systemctl restart l4d2
 ```
 
 The script downloads the SourceMod files via `curl` and the Workshop
 addons via `install-workshop-map.sh` (anonymous SteamCMD). Idempotent —
-existing files are skipped; pass `FORCE=1` to re-download.
+existing files are skipped; delete a specific file and re-run to refresh
+it.
 
 Verify after restart via RCON:
 
@@ -392,6 +394,17 @@ Expected in-game behaviour:
 Tune `abm_offertakeover` / `abm_minplayers` in `cfg/sourcemod/abm.cfg`
 and Left 4 Bots 2 cvars in `left4dead2/left4bots2/cfg/convars.txt` if
 you want to change defaults.
+
+- `sm_admin` → Player Commands → Swap — same
+
+In practice, the reliable fix is to restart the service:
+
+```bash
+sudo systemctl restart l4d2
+```
+
+You will reconnect on a fresh team assignment. Anyone else connected
+will also be kicked, so use this sparingly.
 
 ## Daily operations
 
