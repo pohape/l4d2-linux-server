@@ -56,6 +56,7 @@ On `Ubuntu 22.04`, install the `i386` runtime packages before downloading the ga
 │   ├── _common.sh
 │   ├── enable-service.sh
 │   ├── install-mms-sm.sh
+│   ├── install-mods.sh
 │   ├── install-packages.sh
 │   ├── install-steamcmd.sh
 │   ├── install-templates.sh
@@ -328,6 +329,69 @@ Switch to it in-game (as a SourceMod admin):
 sm_map pujo         # day variant
 sm_map pujonight    # night variant
 ```
+
+## Install verified mods
+
+A small stack of community mods that all deploy server-side (no client
+subscription required). Together they give smart survivor bots and a
+proper «die → pick a bot to take over» flow, so a solo coop run keeps
+going after you die instead of restarting the round.
+
+SourceMod plugins (fetched into `addons/sourcemod/`):
+
+- **hp_tank_show** ([source](https://github.com/fbef0102/L4D1_2-Plugins/tree/master/hp_tank_show))
+  — color-coded sprite over a tank's head (green → orange → red with HP,
+  `R.I.P.` on death).
+- **abm** — Advanced Bot Manager
+  ([source](https://github.com/zonde306/l4d2sc/blob/master/l4d2_abm.sp),
+  prebuilt binary in [Beats0/L4D2-Linux-Server-Package](https://github.com/Beats0/L4D2-Linux-Server-Package))
+  — auto-spawns survivor bots to keep the team at 4, and on player death
+  shows a numbered text menu so you can pick any living bot to take
+  over. Works on standard campaigns and on arena maps (Tank Challenge
+  verified).
+- **left4dhooks** ([github](https://github.com/SilvDev/Left4DHooks))
+  — required SourceMod extension for `hp_tank_show`.
+
+Steam Workshop VScript addons (fetched into `addons/` as VPKs):
+
+- **Left 4 Bots 2** ([Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3022416274) · [github](https://github.com/smilz0/Left4Bots))
+  — smart survivor AI: defib dead players, scavenge gas cans, follow
+  leader, smarter combat.
+- **Left 4 Lib** ([Workshop](https://steamcommunity.com/workshop/filedetails/?id=2634208272))
+  — required VScript library for Left 4 Bots 2.
+
+Install the whole stack in one shot:
+
+```bash
+sudo bash /opt/l4d2-linux-server/scripts/install-mods.sh
+sudo systemctl restart l4d2
+```
+
+The script downloads the SourceMod files via `curl` and the Workshop
+addons via `install-workshop-map.sh` (anonymous SteamCMD). Idempotent —
+existing files are skipped; pass `FORCE=1` to re-download.
+
+Verify after restart via RCON:
+
+```txt
+sm plugins list
+```
+
+You should see `ABM`, `[L4D1 & L4D2] Tank HP Sprite`, and
+`[L4D & L4D2] Left 4 DHooks Direct`. Left 4 Bots 2 is VScript, not
+SourceMod, so it does not show up there — its load is logged at map
+start as `Including left4bots...` in `journalctl -u l4d2`.
+
+Expected in-game behaviour:
+
+- survivor bots defib dead players, pick up meds/throwables, follow leader
+- when you die, a numbered text menu appears listing the live bots —
+  press a digit to take over that bot and keep playing
+- mission keeps going as long as any survivor (bot or human) is alive
+
+Tune `abm_offertakeover` / `abm_minplayers` in `cfg/sourcemod/abm.cfg`
+and Left 4 Bots 2 cvars in `left4dead2/left4bots2/cfg/convars.txt` if
+you want to change defaults.
 
 ## Daily operations
 

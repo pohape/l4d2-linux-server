@@ -6,7 +6,7 @@
 # Set FORCE=1 to reinstall (overwrites matching files; local edits to files
 # not shipped in the archives are preserved).
 #
-# URLs pin the 1.12 branch that was verified on the moscow5 reference build.
+# URLs pin the 1.12 branch that was verified in a real deployment.
 # If AlliedModders retires these exact builds, override via env:
 #   MMS_URL=... SM_URL=... sudo -E bash install-mms-sm.sh
 
