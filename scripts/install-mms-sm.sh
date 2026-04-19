@@ -2,20 +2,18 @@
 #
 # Step 5: install Metamod:Source and SourceMod into the L4D2 game directory.
 #
-# Idempotent: if Metamod/SourceMod are already installed, skips the download.
-# Set FORCE=1 to reinstall (overwrites matching files; local edits to files
-# not shipped in the archives are preserved).
+# Pins the Linux 1.12 builds verified in a real deployment. If these exact
+# URLs ever get retired by AlliedModders, update them in this file.
 #
-# URLs pin the 1.12 branch that was verified in a real deployment.
-# If AlliedModders retires these exact builds, override via env:
-#   MMS_URL=... SM_URL=... sudo -E bash install-mms-sm.sh
+# Idempotent — if Metamod/SourceMod are already installed, skips the
+# download. To reinstall, remove addons/metamod.vdf and addons/sourcemod/
+# first, then re-run.
 
 set -euo pipefail
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
-MMS_URL="${MMS_URL:-https://mms.alliedmods.net/mmsdrop/1.12/mmsource-1.12.0-git1219-linux.tar.gz}"
-SM_URL="${SM_URL:-https://sm.alliedmods.net/smdrop/1.12/sourcemod-1.12.0-git7223-linux.tar.gz}"
-FORCE="${FORCE:-0}"
+MMS_URL="https://mms.alliedmods.net/mmsdrop/1.12/mmsource-1.12.0-git1219-linux.tar.gz"
+SM_URL="https://sm.alliedmods.net/smdrop/1.12/sourcemod-1.12.0-git7223-linux.tar.gz"
 
 require_root "$@"
 require_user "$STEAM_USER"
@@ -25,19 +23,9 @@ if ! sudo -u "$STEAM_USER" test -d "$GAME_DIR"; then
   exit 1
 fi
 
-mms_installed=0
 if sudo -u "$STEAM_USER" test -f "$GAME_DIR/addons/metamod.vdf" \
    && sudo -u "$STEAM_USER" test -d "$GAME_DIR/addons/metamod"; then
-  mms_installed=1
-fi
-
-sm_installed=0
-if sudo -u "$STEAM_USER" test -d "$GAME_DIR/addons/sourcemod/plugins"; then
-  sm_installed=1
-fi
-
-if [ "$mms_installed" = "1" ] && [ "$FORCE" != "1" ]; then
-  skip "Metamod already installed (set FORCE=1 to reinstall)"
+  skip "Metamod already installed (remove addons/metamod.vdf to reinstall)"
 else
   info "Installing Metamod:Source from $MMS_URL"
   sudo -u "$STEAM_USER" -H bash -c "
@@ -49,8 +37,8 @@ else
   ok "Metamod installed"
 fi
 
-if [ "$sm_installed" = "1" ] && [ "$FORCE" != "1" ]; then
-  skip "SourceMod already installed (set FORCE=1 to reinstall)"
+if sudo -u "$STEAM_USER" test -d "$GAME_DIR/addons/sourcemod/plugins"; then
+  skip "SourceMod already installed (remove addons/sourcemod/ to reinstall)"
 else
   info "Installing SourceMod from $SM_URL"
   sudo -u "$STEAM_USER" -H bash -c "

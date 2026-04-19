@@ -5,12 +5,12 @@
 #
 # Not meant to be executed directly.
 
-STEAM_USER="${STEAM_USER:-steam}"
-STEAM_HOME="${STEAM_HOME:-/home/$STEAM_USER}"
-L4D2_DIR="${L4D2_DIR:-$STEAM_HOME/l4d2}"
-GAME_DIR="${GAME_DIR:-$L4D2_DIR/left4dead2}"
-STEAMCMD_DIR="${STEAMCMD_DIR:-$STEAM_HOME/steamcmd}"
-SERVICE="${SERVICE:-l4d2}"
+STEAM_USER="steam"
+STEAM_HOME="/home/steam"
+L4D2_DIR="/home/steam/l4d2"
+GAME_DIR="/home/steam/l4d2/left4dead2"
+STEAMCMD_DIR="/home/steam/steamcmd"
+SERVICE="l4d2"
 
 if [ -t 1 ]; then
   C_RED=$'\033[31m'

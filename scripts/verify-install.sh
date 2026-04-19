@@ -4,24 +4,16 @@
 #
 # Runs read-only checks and prints a PASS/FAIL summary.
 # Exits 0 when all required checks pass, non-zero otherwise.
-#
 # Run as root (or via sudo). WARN results do not affect the exit code.
-#
-# Environment overrides (defaults in parentheses):
-#   STEAM_USER  (steam)         OS user that owns the install
-#   STEAM_HOME  (/home/steam)   home directory of STEAM_USER
-#   L4D2_DIR    ($STEAM_HOME/l4d2)
-#   L4D2_PORT   (27015)
-#   SERVICE     (l4d2)          systemd unit name
 
 set -u
 
-STEAM_USER="${STEAM_USER:-steam}"
-STEAM_HOME="${STEAM_HOME:-/home/$STEAM_USER}"
-L4D2_DIR="${L4D2_DIR:-$STEAM_HOME/l4d2}"
-GAME_DIR="$L4D2_DIR/left4dead2"
-L4D2_PORT="${L4D2_PORT:-27015}"
-SERVICE="${SERVICE:-l4d2}"
+STEAM_USER="steam"
+STEAM_HOME="/home/steam"
+L4D2_DIR="/home/steam/l4d2"
+GAME_DIR="/home/steam/l4d2/left4dead2"
+L4D2_PORT=27015
+SERVICE="l4d2"
 
 if [ "${EUID:-$(id -u)}" -ne 0 ]; then
   echo "verify-install.sh must run as root. Try: sudo $0" >&2

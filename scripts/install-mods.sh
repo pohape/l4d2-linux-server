@@ -15,8 +15,9 @@
 #   - Left 4 Bots 2  — smart survivor bot AI (defib, scavenge, smarter
 #                       combat, follow-leader, etc.)
 #
-# Idempotent: skips files that already exist. Pass FORCE=1 to re-download
-# everything. Files are written under /home/steam/l4d2/left4dead2/.
+# Idempotent — skips files that already exist. To re-download a specific
+# file, delete it first then re-run. Files are written under
+# /home/steam/l4d2/left4dead2/.
 #
 # After running, restart the service to load everything:
 #   sudo systemctl restart l4d2
@@ -24,8 +25,6 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
-
-FORCE="${FORCE:-0}"
 
 require_root "$@"
 require_user "$STEAM_USER"
@@ -59,7 +58,7 @@ for entry in "${DOWNLOADS[@]}"; do
   url="${entry%%|*}"
   dst="${entry##*|}"
 
-  if sudo -u "$STEAM_USER" test -f "$dst" && [ "$FORCE" != "1" ]; then
+  if sudo -u "$STEAM_USER" test -f "$dst"; then
     skip "$(basename "$dst") already exists"
     continue
   fi
@@ -75,7 +74,7 @@ section "Installing Steam Workshop VScript addons"
 
 # Left 4 Lib first (dependency), then Left 4 Bots 2.
 for wid in 2634208272 3022416274; do
-  FORCE="$FORCE" WORKSHOP_ITEM="$wid" bash "$SCRIPT_DIR/install-workshop-map.sh"
+  "$SCRIPT_DIR/install-workshop-map.sh" "$wid"
 done
 
 cat <<EOF

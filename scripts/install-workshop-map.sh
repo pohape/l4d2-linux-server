@@ -1,31 +1,30 @@
 #!/usr/bin/env bash
 #
-# Install an L4D2 Steam Workshop map into the dedicated server.
+# Install an L4D2 Steam Workshop VPK (map or addon) into the server.
 #
-# Downloads a workshop item via anonymous SteamCMD and copies the resulting
-# file into addons/ as a .vpk. Idempotent: skips the download if the target
-# VPK already exists (set FORCE=1 to re-download).
+# Usage:
+#   sudo install-workshop-map.sh <WORKSHOP_ITEM> [VPK_NAME]
 #
-# Required env var:
-#   WORKSHOP_ITEM  workshop file id (digits), e.g. 1432537029
+# Downloads the workshop item via anonymous SteamCMD and copies the result
+# into addons/ as a .vpk.
 #
-# Optional:
-#   VPK_NAME        destination filename in addons/
-#                   (default: workshop_<WORKSHOP_ITEM>.vpk)
-#   WORKSHOP_APPID  default 550 (Left 4 Dead 2)
-#   FORCE           set 1 to re-download even if the VPK already exists
+# Arguments:
+#   WORKSHOP_ITEM  workshop file id, e.g. 1432537029
+#   VPK_NAME       destination filename (default: workshop_<WORKSHOP_ITEM>.vpk)
+#
+# Idempotent — skips the download if the target VPK already exists.
+# To re-download, delete the file first, then run the script again.
 
 set -euo pipefail
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
-WORKSHOP_APPID="${WORKSHOP_APPID:-550}"
-WORKSHOP_ITEM="${WORKSHOP_ITEM:-}"
-VPK_NAME="${VPK_NAME:-}"
-FORCE="${FORCE:-0}"
+WORKSHOP_ITEM="${1:-}"
+VPK_NAME="${2:-}"
 
 if [ -z "$WORKSHOP_ITEM" ]; then
   err "WORKSHOP_ITEM is required."
-  err "Example: sudo WORKSHOP_ITEM=1432537029 bash $0"
+  err "Usage: sudo $0 <WORKSHOP_ITEM> [VPK_NAME]"
+  err "Example: sudo $0 1432537029"
   exit 2
 fi
 
@@ -38,8 +37,8 @@ require_user "$STEAM_USER"
 
 TARGET="$GAME_DIR/addons/$VPK_NAME"
 
-if sudo -u "$STEAM_USER" test -f "$TARGET" && [ "$FORCE" != "1" ]; then
-  skip "$TARGET already exists (set FORCE=1 to re-download)"
+if sudo -u "$STEAM_USER" test -f "$TARGET"; then
+  skip "$TARGET already exists (delete it first to re-download)"
   exit 0
 fi
 
@@ -53,16 +52,16 @@ if ! sudo -u "$STEAM_USER" test -d "$GAME_DIR/addons"; then
   exit 1
 fi
 
-info "Downloading workshop item $WORKSHOP_APPID/$WORKSHOP_ITEM via SteamCMD (anonymous)"
+info "Downloading workshop item $WORKSHOP_ITEM via SteamCMD (anonymous)"
 sudo -u "$STEAM_USER" -H bash -c "
   set -euo pipefail
   cd '$STEAMCMD_DIR'
   ./steamcmd.sh +login anonymous \
-    +workshop_download_item $WORKSHOP_APPID $WORKSHOP_ITEM validate \
+    +workshop_download_item 550 $WORKSHOP_ITEM validate \
     +quit
 "
 
-CONTENT_DIR="$STEAM_HOME/Steam/steamapps/workshop/content/$WORKSHOP_APPID/$WORKSHOP_ITEM"
+CONTENT_DIR="$STEAM_HOME/Steam/steamapps/workshop/content/550/$WORKSHOP_ITEM"
 
 if ! sudo -u "$STEAM_USER" test -d "$CONTENT_DIR"; then
   err "Workshop content dir not found: $CONTENT_DIR"

@@ -2,17 +2,15 @@
 #
 # Step 6: copy template files from the repo into the right places on disk.
 #
-# By default, existing targets are NOT overwritten — so it's safe to re-run
-# and you won't lose your rcon_password or hostname. Set FORCE=1 to back up
-# the existing file (to <dst>.bak.<timestamp>) and replace it with the
-# template.
+# Idempotent — if a target file already exists, it is NOT overwritten. So
+# you can re-run this safely and won't lose your rcon_password, hostname,
+# or admin list. To reinstall a template, delete the target file first.
 
 set -euo pipefail
-source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/_common.sh"
 
-REPO_DIR="${REPO_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-TEMPLATES_DIR="$REPO_DIR/templates"
-FORCE="${FORCE:-0}"
+TEMPLATES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)/templates"
 
 require_root "$@"
 require_user "$STEAM_USER"
@@ -30,15 +28,9 @@ install_file() {
     return 1
   fi
 
-  if [ -e "$dst" ] && [ "$FORCE" != "1" ]; then
-    skip "$dst exists (set FORCE=1 to back up and overwrite)"
+  if [ -e "$dst" ]; then
+    skip "$dst already exists (delete it first to reinstall from template)"
     return 0
-  fi
-
-  if [ -e "$dst" ] && [ "$FORCE" = "1" ]; then
-    local backup="$dst.bak.$(date +%Y%m%d%H%M%S)"
-    cp -p "$dst" "$backup"
-    info "Backed up $dst -> $backup"
   fi
 
   install -D -o "$owner" -g "$group" -m 644 "$src" "$dst"

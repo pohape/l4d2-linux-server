@@ -5,13 +5,13 @@
 # Downloads steamcmd_linux.tar.gz (unless already installed) and creates the
 # sdk32/steamclient.so symlink expected by L4D2 and other Source games.
 #
-# Skips the download if SteamCMD is already present. Re-runs always refresh
-# the sdk32 symlink.
+# Idempotent — skips the download if SteamCMD is already present.
+# Re-runs always refresh the sdk32 symlink.
 
 set -euo pipefail
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
-STEAMCMD_URL="${STEAMCMD_URL:-https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz}"
+STEAMCMD_URL="https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 
 require_root "$@"
 require_user "$STEAM_USER"
