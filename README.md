@@ -395,16 +395,25 @@ Tune `abm_offertakeover` / `abm_minplayers` in `cfg/sourcemod/abm.cfg`
 and Left 4 Bots 2 cvars in `left4dead2/left4bots2/cfg/convars.txt` if
 you want to change defaults.
 
-- `sm_admin` → Player Commands → Swap — same
+### Admin note on the takeover menu — pick survivor bots only
 
-In practice, the reliable fix is to restart the service:
+`abm_offertakeover 1` restricts the menu to survivor bots for non-admin
+players, but ABM **bypasses that filter for admins** — as an admin you
+see every living bot, including infected ones (Tank, Boomer, Hunter,
+Smoker, Jockey, Charger, Spitter).
+
+**Only pick survivor-named entries** from the menu: Coach, Ellis, Nick,
+Rochelle, Bill, Zoey, Francis, Louis.
+
+If you accidentally pick an infected bot on a coop map, you get stuck on
+the Infected team and no in-game command reliably brings you back. The
+only working fix is to restart the service:
 
 ```bash
 sudo systemctl restart l4d2
 ```
 
-You will reconnect on a fresh team assignment. Anyone else connected
-will also be kicked, so use this sparingly.
+This kicks everyone connected, so use it sparingly.
 
 ## Daily operations
 
