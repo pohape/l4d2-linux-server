@@ -127,7 +127,8 @@ sudo /opt/l4d2-linux-server/scripts/install-steamcmd.sh
 sudo -u steam -H bash -lc 'cd /home/steam/steamcmd && ./steamcmd.sh'
 ```
 
-Внутри `SteamCMD`:
+Внутри `SteamCMD` введи команды **строго в этом порядке** — не
+пропускай `force_install_dir` и не ставь его после `login`:
 
 ```txt
 force_install_dir /home/steam/l4d2
@@ -138,6 +139,10 @@ quit
 
 Примечания:
 
+- `force_install_dir` должен идти **первой** строкой. Если ты сделаешь
+  `login` раньше него, SteamCMD поставит игру в свой дефолт
+  (`~/Steam/steamapps/common/Left 4 Dead 2 Dedicated Server/`) и скрипты
+  из этого репо её не найдут.
 - `login <steam_login>` это placeholder, туда нужно подставить свой реальный логин Steam
 - пароль `Steam` будет запрошен интерактивно
 - если включён `Steam Guard`, `SteamCMD` дополнительно попросит код `Steam Guard`
