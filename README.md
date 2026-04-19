@@ -24,16 +24,36 @@ Comfortable baseline, verified on a real public deployment:
 - 2 vCPU
 - 2 GB RAM (server + OS; 4 GB is roomy)
 - 20 GB disk (Ubuntu ~4 GB + game ~10 GB + headroom; 30 GB is roomy)
-- Ubuntu 22.04 LTS, x86_64
+- Ubuntu 22.04 or 24.04 LTS, x86_64
 - a public IPv4
 
 `srcds_linux` typically uses ~250–500 MB RAM and occupies one core under
 full 8-player load. Bandwidth per player is ~30–50 KB/s (4 players ≈
 2 Mbit/s), which fits inside any VPS's included traffic.
 
+## Recommended hosting
+
+Verified on [Tencent Cloud Lighthouse](https://www.tencentcloud.com/products/lighthouse)
+(Frankfurt region) on their intro promo tier:
+
+- **~$10 USD for the first year** (renews at roughly $50/year)
+- 2 vCPU, 2 GB RAM, 40 GB SSD
+- public IPv4 via NAT — inside the VM `eth0` shows a private address
+  (e.g. `10.9.x.x`); you connect from the outside to the mapped public
+  IP shown in the Lighthouse console
+- bandwidth capped around ~3 Mbit/s on the promo tier — enough for a
+  full 4-player L4D2 session, but the initial SteamCMD download of
+  ~10 GB will take a while (plan for 30+ min)
+
+Pick **Ubuntu 22.04 LTS** when creating the VM (primary verified
+baseline). Ubuntu 24.04 LTS has also been verified end-to-end.
+
+Promo pricing, region list and bandwidth caps change over time — check
+the current terms in the Tencent Cloud console before buying.
+
 ## Important notes
 
-Select OS: Ubuntu 22.04
+Select OS: Ubuntu 22.04 or 24.04 LTS (both verified).
 
 ### The server install required a real Steam account with owned L4D2
 
@@ -47,7 +67,7 @@ What worked:
 
 ### The server is still a 32-bit workload
 
-On `Ubuntu 22.04`, install the `i386` runtime packages before downloading the game.
+On `Ubuntu 22.04` / `24.04`, install the `i386` runtime packages before downloading the game.
 
 ## Repository layout
 
@@ -119,7 +139,8 @@ Downloads SteamCMD into `/home/steam/steamcmd` and creates the
 sudo -u steam -H bash -lc 'cd /home/steam/steamcmd && ./steamcmd.sh'
 ```
 
-Inside the SteamCMD console:
+Inside the SteamCMD console, enter these **in this exact order** — do
+not skip `force_install_dir` or put it after `login`:
 
 ```txt
 force_install_dir /home/steam/l4d2
@@ -130,6 +151,10 @@ quit
 
 Notes:
 
+- `force_install_dir` MUST be the first line. If you run `login` before
+  it, SteamCMD installs into its own default
+  (`~/Steam/steamapps/common/Left 4 Dead 2 Dedicated Server/`) and the
+  scripts in this repo will not find the game.
 - `login <steam_login>` is a placeholder; enter your real Steam login there
 - SteamCMD will ask for the account password interactively
 - if Steam Guard is enabled, SteamCMD will also ask for the Steam Guard code
