@@ -1,6 +1,6 @@
 [🇷🇺 Russian guide is available here](README.ru.md)
 
-# l4d2-linux-server
+# Set Up a Left 4 Dead 2 Server on Ubuntu VPS in 20 Minutes
 
 Scripts and templates to set up a public `Left 4 Dead 2` dedicated server
 on an Ubuntu VPS quickly, and to install Steam Workshop maps without the
@@ -17,20 +17,9 @@ What you get:
 
 Based on a real deployment on a public VPS, not on old forum guides.
 
-## Verified setup
-
-- OS: `Ubuntu 22.04`
-- Architecture: `x86_64`
-- Server install path: `/home/steam/l4d2`
-- `SteamCMD` path: `/home/steam/steamcmd`
-- Public game port: `27015`
-- L4D2 dedicated server app id: `222860`
-
 ## Important notes
 
-### Native Linux server
-
-The L4D2 dedicated server runs natively on Linux via `srcds_linux`.
+Select OS: Ubuntu 22.04
 
 ### The server install required a real Steam account with owned L4D2
 
@@ -397,7 +386,7 @@ you want to change defaults.
 
 ### Admin note on the takeover menu — pick survivor bots only
 
-`abm_offertakeover 1` restricts the menu to survivor bots for non-admin
+ABM restricts the menu to survivor bots for non-admin
 players, but ABM **bypasses that filter for admins** — as an admin you
 see every living bot, including infected ones (Tank, Boomer, Hunter,
 Smoker, Jockey, Charger, Spitter).
@@ -482,7 +471,7 @@ This repository does not configure `FastDL`. If you switch the server to `Tank C
 - forgot to open the required ports in the cloud provider's web UI
 - forgot to open the required ports in the VPS's own firewall
 - tried to install the server with `anonymous` instead of a Steam account that owns L4D2
-- did not add their SteamID to `admins_simple.ini`, then tried to open `sm_admin`
+- did not add your SteamID to `admins_simple.ini`, then tried to open `sm_admin`
 - tried to switch the server to `Tank Challenge` without installing the map first
 
 ### Start on a stock map, switch to custom maps manually
