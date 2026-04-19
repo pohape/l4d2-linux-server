@@ -312,6 +312,89 @@ In the in-game console:
 sm_admin
 ```
 
+## Useful admin commands
+
+All of these run in the in-game console (default `~` key). You must be
+listed in `admins_simple.ini` for them to work.
+
+- **`sm_admin`** — opens the interactive admin menu (player list,
+  server commands, voting, …).
+  ```txt
+  sm_admin
+  ```
+
+- **`sm_map <mapname>`** — change the current map (the map must be in
+  `adminmenu_maplist.ini`; `install-workshop-map.sh` registers
+  Workshop maps automatically).
+  ```txt
+  sm_map c2m1_highway
+  sm_map l4d2_ravenholmwar_1
+  ```
+
+- **`sm_cvar <cvar> <value>`** — change any server cvar on the fly.
+  ```txt
+  sm_cvar z_difficulty Impossible
+  sm_cvar mp_gamemode versus
+  ```
+
+- **`sm_kick <name> [reason]`** — disconnect a player.
+  ```txt
+  sm_kick PlayerName afk
+  ```
+
+- **`sm_ban <name> <minutes> [reason]`** — ban a player (`0` minutes =
+  permanent).
+  ```txt
+  sm_ban BadPlayer 60 griefing
+  sm_ban BadPlayer 0 cheats
+  ```
+
+- **`sm_slay <name>`** — instantly kill a player. `@me` kills yourself
+  (handy to trigger the ABM takeover menu for testing).
+  ```txt
+  sm_slay @me
+  sm_slay PlayerName
+  ```
+
+- **`sm_slap <name> [damage]`** — damage a player without killing.
+  ```txt
+  sm_slap PlayerName 10
+  ```
+
+- **`sm_who`** — list connected players and their admin flags.
+  ```txt
+  sm_who
+  ```
+
+- **`sm_say <message>`** / **`sm_psay <name> <message>`** — broadcast
+  a message to everyone / private message to one player.
+  ```txt
+  sm_say Map change in 30 seconds
+  sm_psay PlayerName stop friendly fire
+  ```
+
+- **`sm_reloadadmins`** — reload `admins_simple.ini` after adding new
+  admin SteamIDs (no service restart needed).
+  ```txt
+  sm_reloadadmins
+  ```
+
+- **`sm plugins refresh`** — reload plugin configs, including
+  `adminmenu_maplist.ini` (pick up newly-installed maps without
+  restarting the service).
+  ```txt
+  sm plugins refresh
+  ```
+
+### L4D2 cvars you'll often tune via `sm_cvar`
+
+- `z_difficulty` — `Easy` / `Normal` / `Hard` (Advanced) / `Impossible` (Expert)
+- `mp_gamemode` — `coop` / `versus` / `scavenge` / `realism` / `survival`
+- `sv_gametypes` — advertised mode in the server browser (`"coop"`, `"versus"`, …)
+- `survivor_limit` — maximum survivor slots (default 4)
+- `director_no_specials` / `director_no_mobs` — disable special infected / horde spawns
+- `mp_teams_unbalance_limit` — set to `0` to allow uneven teams in versus
+
 ## Install a custom map from the Steam Workshop
 
 `install-workshop-map.sh` downloads any L4D2 Workshop map via anonymous
