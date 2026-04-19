@@ -48,6 +48,20 @@ Verified on [Tencent Cloud Lighthouse](https://www.tencentcloud.com/products/lig
 Pick **Ubuntu 22.04 LTS** when creating the VM (primary verified
 baseline). Ubuntu 24.04 LTS has also been verified end-to-end.
 
+> **Lighthouse has its own built-in firewall** that blocks every
+> inbound port except SSH (22) by default — the OS-level firewall
+> inside the VM (`iptables`/`ufw`) is irrelevant if the Lighthouse
+> edge firewall is closed. When you reach Step 8 below, open the game
+> ports in the Lighthouse console under the instance's **Firewall**
+> tab (not "Security groups"):
+>
+> - UDP 27015, TCP 27015
+> - UDP 27000–27030
+> - UDP 4380
+>
+> source `0.0.0.0/0`. Without these rules the server is unreachable
+> from outside even though it is running inside the VM.
+
 Promo pricing, region list and bandwidth caps change over time — check
 the current terms in the Tencent Cloud console before buying.
 
