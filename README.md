@@ -17,6 +17,20 @@ What you get:
 
 Based on a real deployment on a public VPS, not on old forum guides.
 
+## Minimum VPS specs
+
+Comfortable baseline, verified on a real public deployment:
+
+- 2 vCPU
+- 2 GB RAM (server + OS; 4 GB is roomy)
+- 20 GB disk (Ubuntu ~4 GB + game ~10 GB + headroom; 30 GB is roomy)
+- Ubuntu 22.04 LTS, x86_64
+- a public IPv4
+
+`srcds_linux` typically uses ~250–500 MB RAM and occupies one core under
+full 8-player load. Bandwidth per player is ~30–50 KB/s (4 players ≈
+2 Mbit/s), which fits inside any VPS's included traffic.
+
 ## Important notes
 
 Select OS: Ubuntu 22.04
