@@ -47,6 +47,10 @@ else
     tar -xzf /tmp/sourcemod.tar.gz -C '$GAME_DIR'
     rm -f /tmp/sourcemod.tar.gz
   "
+  # SM ships admins_simple.ini with only doc comments, no actual "Admins" {}
+  # block. Removing it here so install-templates.sh places our version that
+  # contains the wrapper and a commented example.
+  sudo -u "$STEAM_USER" rm -f "$GAME_DIR/addons/sourcemod/configs/admins_simple.ini"
   ok "SourceMod installed"
 fi
 
