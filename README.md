@@ -527,6 +527,36 @@ Skill`, `Follow Range`. The addon persists its state server-side in
 `left4dead2/ems/advanced bot ai/settings.txt`, which it rewrites itself
 — edit it only with the server stopped, otherwise use the menu.
 
+#### Make yourself an admin for `!botmenu`
+
+`!botmenu` answers `This command is for admin only.` until your SteamID
+is in the addon's **own** admin list. It does not read SourceMod's
+`admins_simple.ini` — that file only controls `sm_*` commands. Create
+this file on the server:
+
+```bash
+sudo -u steam tee "/home/steam/l4d2/left4dead2/ems/advanced bot ai/admins.txt" <<'EOF'
+STEAM_1:0:12345678 //your_nickname
+EOF
+```
+
+Format, as parsed by the addon:
+
+- one SteamID per line, in `STEAM_1:X:XXXXXXX` form
+- everything after `//` on a line is ignored, so use it for names
+- `STEAM_0` is accepted too, the addon rewrites it to `STEAM_1`
+
+Use the same SteamID you put into `admins_simple.ini` (see step 6). If
+you are unsure which ID the server actually sees for you, connect once
+and read it from the log:
+
+```bash
+sudo journalctl -u l4d2 | grep -i "player connected" | tail -3
+```
+
+The list is read when the addon initialises, so run
+`sudo systemctl restart l4d2` (or just change the map) after editing it.
+
 ### Admin note on the takeover menu — pick survivor bots only
 
 ABM restricts the menu to survivor bots for non-admin
