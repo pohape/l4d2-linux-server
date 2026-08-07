@@ -520,12 +520,36 @@ Expected in-game behaviour:
 
 Tune `abm_offertakeover` / `abm_minplayers` in `cfg/sourcemod/abm.cfg`.
 
-Advanced Bot AI is configured from the game — open the chat and type
-`!botmenu`. Useful toggles: `Throw Molotov` / `Throw Pipe Bomb` (turn
-throwing off so the bots only hand throwables to players), `Bot Combat
-Skill`, `Follow Range`. The addon persists its state server-side in
-`left4dead2/ems/advanced bot ai/settings.txt`, which it rewrites itself
-— edit it only with the server stopped, otherwise use the menu.
+Advanced Bot AI is configured from the game chat. `!botmenu` opens a HUD
+panel with every option, but that panel is a keybind menu (it reacts to
+the `+grenade1` key, not to the number keys and not to `menuselect`), so
+the direct chat commands are usually easier — every menu entry has one:
+
+```txt
+!botthrowmolotov     bots stop throwing molotovs (they still hand them to players)
+!botthrowpipe        same for pipe bombs
+!botskill            bot combat skill, 1..5
+!botfollow           how close the bots stay to you
+!botmelee            allow bots to pick up melee weapons
+!botdefib            defib dead survivors
+!botupgrades         use laser sights / incendiary ammo
+!botfindgas          fetch gas cans on scavenge maps
+!botteleport         teleport a bot that fell too far behind
+!botunstick          teleport a bot that got stuck
+!botnotice           silence the config notifications in chat
+```
+
+The rest, mostly damage multipliers and protections: `!botprotect`,
+`!botfireprotect`, `!botacidprotect`, `!botnonaliveprotect`,
+`!botimmunity`, `!bottankdamage`, `!botwitchdamage`,
+`!botspecialdamage`, `!botcommondamage`, `!botnonalivedamage`,
+`!botsaveteleport`, `!botkeepalive`, `!botbackpack`, `!botpathfinding`,
+`!botstop`, `!bottask`, `!botdebug`, `!morebot`.
+
+All of them require admin — see the next section. The addon persists its
+state server-side in `left4dead2/ems/advanced bot ai/settings.txt`,
+which it rewrites itself, so edit that file only with the server
+stopped; otherwise use the chat commands.
 
 #### Make yourself an admin for `!botmenu`
 

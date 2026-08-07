@@ -498,12 +498,36 @@ SourceMod, поэтому в `sm plugins list` он не виден — его �
 Подкрутить `abm_offertakeover` / `abm_minplayers` можно в
 `cfg/sourcemod/abm.cfg`.
 
-Advanced Bot AI настраивается из игры — открой чат и введи `!botmenu`.
-Полезные тумблеры: `Throw Molotov` / `Throw Pipe Bomb` (выключи броски,
-чтобы боты только передавали гранаты игрокам), `Bot Combat Skill`,
-`Follow Range`. Состояние аддон хранит на сервере в
-`left4dead2/ems/advanced bot ai/settings.txt` и перезаписывает файл сам
-— правь его только на остановленном сервере, иначе пользуйся меню.
+Advanced Bot AI настраивается командами в игровом чате. `!botmenu`
+открывает HUD-панель со всеми опциями, но она реагирует на клавишу
+`+grenade1`, а не на цифры и не на `menuselect`, поэтому проще
+пользоваться прямыми командами — они есть у каждого пункта меню:
+
+```txt
+!botthrowmolotov     боты перестают кидать молотовы (передавать игрокам продолжают)
+!botthrowpipe        то же для пайп-бомб
+!botskill <1..99>    боевой навык ботов
+!botfollow <юниты>   на какой дистанции боты держатся возле тебя
+!botmelee            разрешить ботам брать оружие ближнего боя
+!botdefib            поднимать мёртвых дефибриллятором
+!botupgrades         ставить лазерный прицел / зажигательные патроны
+!botfindgas          носить канистры на scavenge-картах
+!botteleport <юниты> телепорт отставшего бота к команде
+!botunstick          телепорт застрявшего бота
+!botnotice           отключить уведомления о смене настроек в чате
+```
+
+Остальные — множители урона и защиты: `!botprotect`,
+`!botfireprotect`, `!botacidprotect`, `!botnonaliveprotect`,
+`!botimmunity`, `!bottankdamage`, `!botwitchdamage`,
+`!botspecialdamage`, `!botcommondamage`, `!botnonalivedamage`,
+`!botsaveteleport`, `!botkeepalive`, `!botbackpack`, `!botpathfinding`,
+`!botstop`, `!bottask`, `!botdebug`, `!morebot`.
+
+Все они требуют админа — см. следующий раздел. Состояние аддон хранит
+на сервере в `left4dead2/ems/advanced bot ai/settings.txt` и
+перезаписывает файл сам, поэтому правь его только на остановленном
+сервере, иначе пользуйся командами.
 
 #### Как прописать себя в админы для `!botmenu`
 
