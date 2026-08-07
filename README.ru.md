@@ -455,11 +455,12 @@ SourceMod плагины (уходят в `addons/sourcemod/`):
 
 Steam Workshop VScript-аддоны (уходят в `addons/` как VPK):
 
-- **Left 4 Bots 2** ([Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3022416274) · [github](https://github.com/smilz0/Left4Bots)) —
-  умный survivor AI: дефибят мёртвых, собирают канистры, идут за лидером,
-  стреляют/уворачиваются умнее.
-- **Left 4 Lib** ([Workshop](https://steamcommunity.com/workshop/filedetails/?id=2634208272)) —
-  VScript-библиотека, зависимость Left 4 Bots 2.
+- **Advanced Bot AI** ([Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1968764163)) —
+  умный survivor AI: боты держатся рядом с игроком, а не разбредаются,
+  не лезут под танка поднимать товарища, передают живым игрокам
+  молотовы/таблетки/аптечки, дефибят мёртвых, ставят улучшения на
+  оружие. Зависимостей нет. Настраивается прямо в игре командой чата
+  `!botmenu`.
 
 Установить весь стек одной командой:
 
@@ -480,22 +481,29 @@ sm plugins list
 ```
 
 В выводе должны быть `ABM`, `[L4D1 & L4D2] Tank HP Sprite` и
-`[L4D & L4D2] Left 4 DHooks Direct`. Left 4 Bots 2 — это VScript, а не
+`[L4D & L4D2] Left 4 DHooks Direct`. Advanced Bot AI — это VScript, а не
 SourceMod, поэтому в `sm plugins list` он не виден — его загрузка
-логируется при старте карты как `Including left4bots...` в
+логируется при старте сервера как `[Bot AI] Bot AI loaded.` в
 `journalctl -u l4d2`.
 
 Ожидаемое поведение в игре:
 
-- боты дефибят мёртвых, подбирают аптечки/гранаты, идут за лидером
+- боты бегут за тобой, отходят от танков, дефибят мёртвых, подбирают
+  аптечки/гранаты и передают предметы живым игрокам
 - когда ты умер, появляется пронумерованное текстовое меню со списком
   живых ботов — жми цифру, пересаживаешься в выбранного бота и
   продолжаешь играть
 - миссия не заканчивается пока жив хоть один survivor (бот или human)
 
-Подкрутить `abm_offertakeover` / `abm_minplayers` в `cfg/sourcemod/abm.cfg`
-и cvar'ы Left 4 Bots 2 в `left4dead2/left4bots2/cfg/convars.txt`, если
-хочется менять дефолты.
+Подкрутить `abm_offertakeover` / `abm_minplayers` можно в
+`cfg/sourcemod/abm.cfg`.
+
+Advanced Bot AI настраивается из игры — открой чат и введи `!botmenu`.
+Полезные тумблеры: `Throw Molotov` / `Throw Pipe Bomb` (выключи броски,
+чтобы боты только передавали гранаты игрокам), `Bot Combat Skill`,
+`Follow Range`. Состояние аддон хранит на сервере в
+`left4dead2/ems/advanced bot ai/settings.txt` и перезаписывает файл сам
+— правь его только на остановленном сервере, иначе пользуйся меню.
 
 ### Нюанс про меню takeover для админа — выбирай только survivor-ботов
 

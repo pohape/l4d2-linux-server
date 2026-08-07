@@ -480,11 +480,12 @@ SourceMod plugins (fetched into `addons/sourcemod/`):
 
 Steam Workshop VScript addons (fetched into `addons/` as VPKs):
 
-- **Left 4 Bots 2** ([Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3022416274) · [github](https://github.com/smilz0/Left4Bots))
-  — smart survivor AI: defib dead players, scavenge gas cans, follow
-  leader, smarter combat.
-- **Left 4 Lib** ([Workshop](https://steamcommunity.com/workshop/filedetails/?id=2634208272))
-  — required VScript library for Left 4 Bots 2.
+- **Advanced Bot AI** ([Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1968764163))
+  — smart survivor AI: bots stay close to the human instead of wandering
+  off, keep away from tanks instead of walking under them to revive a
+  teammate, hand molotovs/pills/medkits over to players, defib, use
+  weapon upgrades. No dependencies. Configurable in game with the
+  `!botmenu` chat command.
 
 Install the whole stack in one shot:
 
@@ -505,20 +506,26 @@ sm plugins list
 ```
 
 You should see `ABM`, `[L4D1 & L4D2] Tank HP Sprite`, and
-`[L4D & L4D2] Left 4 DHooks Direct`. Left 4 Bots 2 is VScript, not
-SourceMod, so it does not show up there — its load is logged at map
-start as `Including left4bots...` in `journalctl -u l4d2`.
+`[L4D & L4D2] Left 4 DHooks Direct`. Advanced Bot AI is VScript, not
+SourceMod, so it does not show up there — its load is logged on server
+start as `[Bot AI] Bot AI loaded.` in `journalctl -u l4d2`.
 
 Expected in-game behaviour:
 
-- survivor bots defib dead players, pick up meds/throwables, follow leader
+- survivor bots follow you closely, back off from tanks, defib dead
+  players, pick up meds/throwables, and hand items to human players
 - when you die, a numbered text menu appears listing the live bots —
   press a digit to take over that bot and keep playing
 - mission keeps going as long as any survivor (bot or human) is alive
 
-Tune `abm_offertakeover` / `abm_minplayers` in `cfg/sourcemod/abm.cfg`
-and Left 4 Bots 2 cvars in `left4dead2/left4bots2/cfg/convars.txt` if
-you want to change defaults.
+Tune `abm_offertakeover` / `abm_minplayers` in `cfg/sourcemod/abm.cfg`.
+
+Advanced Bot AI is configured from the game — open the chat and type
+`!botmenu`. Useful toggles: `Throw Molotov` / `Throw Pipe Bomb` (turn
+throwing off so the bots only hand throwables to players), `Bot Combat
+Skill`, `Follow Range`. The addon persists its state server-side in
+`left4dead2/ems/advanced bot ai/settings.txt`, which it rewrites itself
+— edit it only with the server stopped, otherwise use the menu.
 
 ### Admin note on the takeover menu — pick survivor bots only
 

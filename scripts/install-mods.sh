@@ -11,9 +11,10 @@
 #   - left4dhooks    — required dependency (L4D hooks + gamedata)
 #
 # Steam Workshop VScript addons (downloaded via install-workshop-map.sh):
-#   - Left 4 Lib     — dependency for Left 4 Bots 2
-#   - Left 4 Bots 2  — smart survivor bot AI (defib, scavenge, smarter
-#                       combat, follow-leader, etc.)
+#   - Advanced Bot AI — smart survivor bot AI: bots stick close to the
+#                       human, keep their distance from tanks, hand
+#                       molotovs/meds over on request, defib, use
+#                       upgrades. Self-contained, no dependencies.
 #
 # Idempotent — skips files that already exist. To re-download a specific
 # file, delete it first then re-run. Files are written under
@@ -72,10 +73,7 @@ section() { printf "\n%s%s%s\n" "$C_BOLD" "$1" "$C_RESET"; }
 
 section "Installing Steam Workshop VScript addons"
 
-# Left 4 Lib first (dependency), then Left 4 Bots 2.
-for wid in 2634208272 3022416274; do
-  "$SCRIPT_DIR/install-workshop-map.sh" "$wid"
-done
+"$SCRIPT_DIR/install-workshop-map.sh" 1968764163
 
 cat <<EOF
 
@@ -83,12 +81,14 @@ Everything in place. Reload to activate:
   sudo systemctl restart l4d2
 
 cvar configs of interest:
-  - cfg/sourcemod/abm.cfg                  (abm_offertakeover, abm_minplayers, …)
-  - cfg/sourcemod/hp_tank_show.cfg         (auto-generated on first load)
-  - left4dead2/left4bots2/cfg/convars.txt  (Left 4 Bots 2 behaviour tuning)
+  - cfg/sourcemod/abm.cfg                    (abm_offertakeover, abm_minplayers, …)
+  - cfg/sourcemod/hp_tank_show.cfg           (auto-generated on first load)
+  - "left4dead2/ems/advanced bot ai/settings.txt"
+        (Advanced Bot AI, written by the addon itself; toggle the same
+         options in game with the !botmenu chat command)
 
 Expected in-game behaviour:
-  - smart survivor bots defib, scavenge, follow
+  - smart survivor bots stay close to you, avoid tanks, defib, hand items over
   - when you die, a numbered menu appears listing the live bots — press a
     digit to take over that bot and keep playing
 EOF
